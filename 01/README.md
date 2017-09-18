@@ -1,9 +1,1 @@
-### What's in this folder?
-
-This folder contains:
-
-- ProgrammingAssignmentX.pdf, the .pdf of the assignment description
-- a `code` directory, containing all code submissions for the assignment
-- a `text` directory, containing all text submissions for the assignment
-
-Stuart Mashaal, 260639962
+This repository contains all my assignment submissions for McGill COMP 310 Operating Systems in the fall of 2017.
