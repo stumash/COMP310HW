@@ -2,3 +2,4 @@
 **/text/*
 !*.pdf
 !*.png
+!*.tex
