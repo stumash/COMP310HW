@@ -9,6 +9,7 @@
 \usepackage{graphicx}
 \usepackage{indentfirst}
 \usepackage{amsmath}
+\usepackage{minted}
 
 \begin{document}
 \maketitle
@@ -34,6 +35,24 @@ Time-sharing is the ability of a computer system to accommodate multiple users s
 
 \section*{Question 2}
 
-As stated in my answer to Question 1, a uniprogramming system is a system that can only run and manage a single process at once.  So, once a job starts, no matter how many parts of that job don't even use the CPU, the CPU will not execute the instructions of any other job.  This means that jobs A, B, and C will run one after the other.  Therefore, the time taken to finish the three jobs on a uniprogramming system is given by $$3 \cdot (2\text{ms} + 10\text{ms} + 4\text{ms}) = 48\text{ms}$$
+As stated in my answer to Question 1, a uniprogramming system is a system that can only run and manage a single process at once.  So, once a job starts, no matter how many parts of that job don't even use the CPU, the CPU will not execute the instructions of any other job until that job finishes.  This means that jobs A, B, and C will run one after the other.  Therefore, the time taken to finish the three jobs on a uniprogramming system is given by $$3 \cdot (2\text{ms} + 10\text{ms} + 4\text{ms}) = 48\text{ms}$$
+
+\section*{Question 3}
+
+\begin{minted}[linenos]{c}
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+int main()
+{
+    close(1); // close stdout
+    open("redirect.txt", O_WRONLY, O_CREAT); // open redirect.txt
+    printf("A simple program output.");
+    return 0;
+}
+\end{minted}
+
+Calling \mintinline{c}{close(1)} closes the connection to {stdout} and removes file descriptor 1 from the process's list of file descriptors.  Then, calling \mintinline{c}{open("redirect.txt", O_WRONLY, O_CREAT)} opens a connection to the file \mintinline{c}{redirect.txt} and puts the file descriptor to it in the slot where we just removed the file descriptor for \mintinline{c}{stdout}.  The flags \mintinline{c}{O_WRONLY} and \mintinline{c}{O_CREAT} mean that the connection to \mintinline{c}{redirect.txt} is 'write-only' and that \mintinline{c}{redirect.txt} will be created if it doesn't already exist.
 
 \end{document}
