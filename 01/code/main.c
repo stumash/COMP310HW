@@ -11,6 +11,6 @@
 
 int main()
 {
-    // TODO: all the shiz
+    printf("Hello, World!");
     return 0;
 }
