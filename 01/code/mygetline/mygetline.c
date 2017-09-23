@@ -11,15 +11,15 @@ size_t mygetline(char *buffer, size_t n, FILE *stream)
     {
         c = getc(stream);
 
-        if (c == '\n' || c == EOF || i == (int)n-1)
-        {
-            buffer[i] = '\0';
-            return i;
-        }
-        else
+        if (!(c == '\n' || c == EOF || i == (int)n-1))
         {
             buffer[i] = c;
             i++;
+        }
+        else
+        {
+            buffer[i] = '\0';
+            return i;
         }
     }
 }
