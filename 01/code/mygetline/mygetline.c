@@ -13,13 +13,13 @@ size_t mygetline(char *buffer, size_t n, FILE *stream)
 
         if (c == '\n' || c == EOF || i == (int)n-1)
         {
-            break;
+            buffer[i] = '\0';
+            return i;
         }
         else
         {
-            *(buffer + i) = c;
+            buffer[i] = c;
             i++;
         }
     }
-    return i + 1;
 }
