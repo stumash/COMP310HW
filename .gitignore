@@ -1,4 +1,6 @@
+main
 *.o
+
 **/text/*
 !*.pdf
 !*.png
