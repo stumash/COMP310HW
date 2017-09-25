@@ -35,7 +35,17 @@ Time-sharing is the ability of a computer system to accommodate multiple users s
 
 \section*{Question 2}
 
-As stated in my answer to Question 1, a uniprogramming system is a system that can only run and manage a single process at once.  So, once a job starts, no matter how many parts of that job don't even use the CPU, the CPU will not execute the instructions of any other job until that job finishes.  This means that jobs A, B, and C will run one after the other.  Therefore, the time taken to finish the three jobs on a uniprogramming system is given by $$3 \cdot (2\text{ms} + 10\text{ms} + 4\text{ms}) = 48\text{ms}$$
+As stated in my answer to Question 1, a uniprogramming system is a system that can only run and manage a single process at once.  So, once a process starts, even if it doesn't use the CPU, the CPU will not execute the instructions of any other process until that process finishes.  This means that jobs A, B, and C will run one after the other.  Therefore, the time taken to finish the three jobs on a uniprogramming system is given by
+
+$$3 \cdot (2\text{ms} + 10\text{ms} + 4\text{ms}) = 48\text{ms}$$
+
+As stated in my answer to Question 1, a multiprogramming system is one that can manage multiple processes at once - whether or not it can actually execute multiple instructions in parallel.  This means that while one process is waiting on IO, the CPU will execute the instructions of another process. We assume that all IO can be done in parallel.  Therefore, the time taken by a multiprogramming system to complete the three jobs, A, B, and C is given by
+
+$$(2 + 2 + 2)\text{ms} + (10 - 4)\text{ms} + (4 + 4 + 4)\text{ms} = 24\text{ms}$$
+
+$(2 + 2 + 2)$ is the time needed for all three jobs to do their first round of computing. $(10 - 4)$ is the time needed to wait for job A to finish its 10s IO which it started 4 seconds before job C finished its first round of computing. $(4 + 4 +4)$ is the time needed for all three jobs to finish their second round of computing. \\
+
+It should be noted that my calculations assume that computing cannot happen in parallel.  If the CPU could execute instructions in parallel, the time needed for all three jobs would just be $2 + 10 + 4 = 16$, since all three jobs could run start-to-finish at the same time.
 
 \section*{Question 3}
 
