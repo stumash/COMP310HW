@@ -11,6 +11,6 @@
  *
  * returns: length of smallest token
  */
-ssize_t minTokenLen(char *s, int slen);
+int minTokenLen(char *s, int slen);
 
 #endif // ifndef MIN_TOKEN_LEN

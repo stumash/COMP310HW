@@ -1,6 +1,6 @@
 #include "getLine.h"
 
-ssize_t getLine(char *buffer, size_t n, FILE *stream)
+int getLine(char *buffer, int n, FILE *stream)
 {
     char c;
     int i = 0;
@@ -8,15 +8,16 @@ ssize_t getLine(char *buffer, size_t n, FILE *stream)
     {
         c = getc(stream);
 
-        // if not at end of string
-        if (!(c == '\n' || c == EOF || c == '\0'))
+        // if not at end of stream
+        if (!charIsEndOfString(c))
         {
             // then if at end of buffer
             if (i == (int)n-1)
             {
-                // end buffer and return error
+                // null-terminate buffer and consume to end of stream
                 buffer[i] = '\0';
-                return -1;
+                while (!charIsEndOfString(c)) { c = getc(stream); }
+                return -1; // return error code
             }
             else
             {
@@ -33,4 +34,9 @@ ssize_t getLine(char *buffer, size_t n, FILE *stream)
             return i;
         }
     }
+}
+
+static int charIsEndOfString(char c)
+{
+    return (c == '\n') || (c == '\0') || (c == EOF);
 }

@@ -1,6 +1,6 @@
 #include "utils/minTokenLen.h"
 
-ssize_t minTokenLen(char *s, int slen)
+int minTokenLen(char *s, int slen)
 {
     int i = 0;
     int wlen = 0; // word length

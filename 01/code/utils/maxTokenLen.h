@@ -11,6 +11,6 @@
  *
  * returns: length of largest token
  */
-ssize_t maxTokenLen(char *s, int slen);
+int maxTokenLen(char *s, int slen);
 
 #endif /* ifndef MAXTOKENLEN_H */

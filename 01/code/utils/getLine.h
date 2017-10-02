@@ -17,6 +17,12 @@
  * error codes:
  *      -1: if length of first line in stream >= n
  */
-ssize_t getLine(char *buffer, size_t n, FILE *stream);
+int getLine(char *buffer, int n, FILE *stream);
+
+/**
+ * returns: true if c == '\0' || c == '\n' || c == EOF
+ */
+static
+int charIsEndOfString(char c);
 
 #endif /* ifndef GETLINE_H */
