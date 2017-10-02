@@ -28,8 +28,7 @@ Multiprogramming is a computing paradigm wherein the computer can manage multipl
     \includegraphics[width=0.5\textwidth]{multiprogramming.png}
 \end{center}
 
-Time-sharing is the ability of a computer system to accommodate multiple users simultanneously.  A time-sharing system is one that uses multiprogramming to allow multiple users to interact with the system at the same time.  While all but one of the users is idle, the system can record (for example) the key-presses of one user.  Time-sharing systems are really just multiprogramming systems in which one of the processes that the system is constantly switching between is the reading in of multiple users' input.
-
+Time-sharing is the natural extension of multiprogramming. It allows multiple users to interact with a computer system simultaneously.  Whereas a multiprogramming batch system aims to maximize CPU usage, a time-sharing system aims to minimize the response time of a system to the inputs of multiple users.  A time-sharing system must use multiprogramming and CPU scheduling to achieve this.  Despite this difference in goals between time-sharing and multiprogramming systems, time-sharing systems tend to also achieve high CPU usage since time-sharing is a functionality built on top of multiprogramming and CPU usage is not entirely tangential to minimizing response time.
 
 \newpage
 

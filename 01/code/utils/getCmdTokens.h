@@ -12,10 +12,9 @@
  * into tokens.
  *
  * returns: tokens as char **args
- *          number of tokens as int n_tok
  *          length of tokens as int tok_len
  */
 void
-getCmdTokens(char **args, int *n_tok, int *tok_len);
+getCmdTokens(char **args, int *tok_len);
 
 #endif /* ifndef GETCMD */

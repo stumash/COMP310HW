@@ -15,9 +15,8 @@ int main()
     while (1)
     {
         char **tokens = 0;
-        int n_tok;
         int tok_len;
-        getCmdTokens(tokens, &n_tok, &tok_len);
+        getCmdTokens(tokens, &tok_len);
     }
 
     return 0;
