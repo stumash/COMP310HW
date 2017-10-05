@@ -1,6 +1,9 @@
 #ifndef GETCMD
 #define GETCMD
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <utils/getLine.h>
 #include <utils/minTokenLen.h>
 #include <utils/maxTokenLen.h>
@@ -11,10 +14,23 @@
  * Print "sh> ". Read line of input on stdin.  Parse input
  * into tokens.
  *
- * returns: tokens as char **args
- *          length of tokens as int tok_len
+ * n_tokens: the number of tokens parsed
+ * len: the length of the token array
+ *
+ * returns: array of string tokens
+ *          n_tokens
+ *          len
  */
-void
-getCmdTokens(char **args, int *tok_len);
+char **getCmdTokens(int *n_tokens, int *len);
+
+/**
+ * Free all token strings and the array that contains
+ * pointers to them.
+ *
+ * tokens: the array of string tokens
+ * n_tokens: the number of tokens in the tokens array
+ * len: the length of the token array
+ */
+void freeCmdTokens(char **tokens, int n_tokens, int len);
 
 #endif /* ifndef GETCMD */

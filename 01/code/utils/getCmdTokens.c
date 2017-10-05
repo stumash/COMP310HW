@@ -1,40 +1,65 @@
 #include <utils/getCmdTokens.h>
 
-void
-getCmdTokens(char **args, int *tok_len)
+char **getCmdTokens(int *n_tokens, int *len)
 {
+
+    //-----------------------------------
+    // 1: get a non-empty line of input
+    //-----------------------------------
+    char buffer[BUFSIZE];
+    int linelen;
     while (1)
     {
-        //-----------------------------------
-        // 1: get a non-empty line of input
-        //-----------------------------------
         fprintf(stdout, "sh> ");
 
-        char buffer[BUFSIZE];
-        int linelen = getLine(buffer, BUFSIZE, stdin);
+        memset(buffer, 0, BUFSIZE);
+        linelen = getLine(buffer, BUFSIZE, stdin);
         if (linelen == -1)
         {
             printf("error: length of input string ≥ %d\n", BUFSIZE);
-            continue;
-        }
-        else if (linelen == 0)
-        {
-            continue;
         }
 
-        //---------------------------------------
-        // 2: parse input into array of strings
-        //---------------------------------------
-        int tokMaxLen = maxTokenLen(buffer, linelen);
-        *tok_len = tokMaxLen;
-
-        int tokMinLen = minTokenLen(buffer, linelen);
-        int maxTokQty = linelen / tokMinLen;
-
-        for (int i = 0; i < maxTokQty; i++)
+        if (linelen > 0)
         {
-            // TODO: allocate string of len tokMaxLen and
-            // parse next token into it
+            break;
         }
     }
+
+    //---------------------------------------------
+    // 2: parse input into array of string tokens
+    //---------------------------------------------
+    int tokMaxLen = maxTokenLen(buffer, linelen);
+    int tokMinLen = minTokenLen(buffer, linelen);
+    *len = linelen/tokMinLen + 1;
+    char **toks = (char **)calloc(*len, sizeof(char *));
+
+    int tokCount = 0;
+    char *str = strtok(buffer, " \t");
+    while (1)
+    {
+        if (!str)
+        {
+            break;
+        }
+
+        *(toks + tokCount) = (char *)calloc(tokMaxLen + 1, sizeof(char));
+        strcpy(*(toks + tokCount), str);
+        tokCount++;
+        str = strtok(0, " \t");
+    }
+
+    *n_tokens = tokCount;
+    return toks;
+}
+
+void freeCmdTokens(char **tokens, int n_tokens, int len)
+{
+    // free tokens
+    for (int i = 0; i < n_tokens; i++)
+    {
+        free(*(tokens + i));
+    }
+
+    // free array holding tokens
+    free(tokens);
 }
