@@ -1,5 +1,5 @@
 #ifndef GETCMD
-#define GETCMD
+#define GETCMD value
 
 #include <stdlib.h>
 #include <string.h>

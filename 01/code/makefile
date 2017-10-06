@@ -1,7 +1,6 @@
 CC = gcc
 
 INCL_DIRS = -I$(dir $(realpath $(MAKEFILE_LIST))) # absolute dirname of makefile
-C11 = -std=c11
 SETT = -Wextra -Wpedantic -Werror -Wshadow
 CFLAGS = $(C11) $(SETT) $(INCL_DIRS)
 
