@@ -36,7 +36,7 @@ sig_handler(int signum)
 {
     if (signum == SIGTSTP)
     {
-        exit(0); //TODO delete this line TODO
+        exit(0); //for testing
         // do nothing
     }
     else // signum must be SIGINT
