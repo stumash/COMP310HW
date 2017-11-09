@@ -8,11 +8,12 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-void exit_gracefully(int signo);
+void exit_gracefully(int signo); // signal handler for SIGINT a.k.a. ^C
 
 int shm_fd; // shared memory object file descriptor
 char *shm_addr; // address of shared memory in mapping to virutal memory
 struct stat s; // file info struct for storing diagnostics on shm
+char cmd_buf[256]; // buffer to store user commands
 
 int main()
 {
@@ -22,7 +23,7 @@ int main()
         exit(1);
     }
 
-    int shm_fd = shm_open("smasha2_a2_shm", O_RDWR, 0);
+    shm_fd = shm_open("smasha2_a2_shm", O_RDWR, 0);
     if (shm_fd < 0)
     {
         printf("Error opening shm\n");
