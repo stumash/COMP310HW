@@ -11,7 +11,7 @@
 #include <utils/constants.h>
 
 /**
- * Print "sh> ". Read line of input on stdin.  Parse input
+ * Print ">> ". Read line of input on stdin.  Parse input
  * into tokens.
  *
  * n_tokens: the number of tokens parsed

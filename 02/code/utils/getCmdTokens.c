@@ -10,7 +10,7 @@ char **getCmdTokens(int *n_tokens, int *len)
     int linelen;
     while (1)
     {
-        fprintf(stdout, "sh> ");
+        fprintf(stdout, ">> ");
 
         memset(buffer, 0, BUFSIZE);
         linelen = getLine(buffer, BUFSIZE, stdin);
