@@ -2,10 +2,11 @@ CC = gcc
 
 INCL_DIRS = -I$(dir $(realpath $(MAKEFILE_LIST))) # absolute dirname of makefile
 SETT = -Wextra -Wpedantic -Werror -Wshadow
+PTHREAD = -pthread
 DEBUG =
-CFLAGS = $(SETT) $(INCL_DIRS) $(DEBUG)
+CFLAGS = $(SETT) $(INCL_DIRS) $(PTHREAD) $(DEBUG)
 
-LDFLAGS = -lrt
+LDFLAGS = -lrt -lm
 
 A2_FALL2017_DEPS = a2_fall2017.c getCmdTokens.o utils/getLine.o utils/minTokenLen.o utils/maxTokenLen.o
 a2_fall2017: $(A2_FALL2017_DEPS)

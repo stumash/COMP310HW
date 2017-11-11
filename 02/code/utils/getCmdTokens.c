@@ -6,17 +6,17 @@ char **getCmdTokens(int *n_tokens, int *len)
     //-----------------------------------
     // 1: get a non-empty line of input
     //-----------------------------------
-    char buffer[BUFSIZE];
+    char buffer[512];
     int linelen;
     while (1)
     {
         fprintf(stdout, ">> ");
 
-        memset(buffer, 0, BUFSIZE);
-        linelen = getLine(buffer, BUFSIZE, stdin);
+        memset(buffer, 0, 512);
+        linelen = getLine(buffer, 512, stdin);
         if (linelen == -1)
         {
-            printf("error: length of input string ≥ %d\n", BUFSIZE);
+            printf("error: length of input string ≥ %d\n", 512);
         }
 
         if (linelen > 0)
