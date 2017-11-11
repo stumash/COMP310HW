@@ -31,6 +31,9 @@
 // semaphore names
 #define SEM_WRITE "sem_write" // semaphore to alter number of active writers (0 or 1)
 #define SEM_READERCOUNT "sem_readercount" // semaphore to alter number of active readers
+// semaphores
+sem_t *write_mutex;
+sem_t *readercount_mutex;
 
 // helper functions
 void exit_gracefully(int signo); // signal handler for SIGINT a.k.a. ^C
@@ -45,7 +48,7 @@ struct stat s; // file info struct for storing diagnostics on shm (reservations)
 
 // shm for readercount
 int shm_rc_fd; // shared memory object file descriptor (readercount)
-char *shm_rc_addr; // address of shared memory in mapping to virutal memory (readercount)
+int *shm_rc_addr; // address of shared memory in mapping to virutal memory (readercount)
 struct stat s_rc; // file info struct for storing diagnostics on shm (readercount)
 
 int main()
@@ -99,8 +102,8 @@ int main()
     shm_rc_addr = mmap(NULL, s.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_rc_fd, 0);
 
     // setup semaphores
-    sem_t *write_mutex = sem_open(SEM_WRITE, O_CREAT, 0644, 1);
-    sem_t *readercount_mutex = sem_open(SEM_READERCOUNT, O_CREAT, 0644, 1);
+    write_mutex = sem_open(SEM_WRITE, O_CREAT, 0644, 1);
+    readercount_mutex = sem_open(SEM_READERCOUNT, O_CREAT, 0644, 1);
 
     // main loop
     char *shmad = shm_addr; // temp variable
@@ -219,6 +222,12 @@ int main()
         //
         else if (!strcmp(tokens[0], STATUS))
         {
+            sem_wait(readercount_mutex);
+            *shm_rc_addr = *shm_rc_addr + 1;
+            if (*shm_rc_addr == 1) { sem_wait(write_mutex); }
+            sem_post(readercount_mutex);
+
+
             int isEmpty = 1;
             for (int i = 0; i < N_TABLES; i++)
             {
@@ -233,6 +242,11 @@ int main()
             {
                 printf("No reservations yet\n");
             }
+
+            sem_wait(readercount_mutex);
+            *shm_rc_addr = *shm_rc_addr - 1;
+            if (*shm_rc_addr == 0) { sem_post(write_mutex); }
+            sem_post(readercount_mutex);
         }
 
         //
@@ -258,13 +272,17 @@ int main()
 }
 
 /**
- * Release the shm, write its contents to stdout, exit
+ * Release semaphores, release the shm, write its contents to stdout, exit
  */
 void exit_gracefully(int signo)
 {
-    //TODO: close semaphores
+    sem_close(write_mutex);
+    sem_close(readercount_mutex);
+
     close(shm_fd);
+    close(shm_rc_fd);
     write(STDOUT_FILENO, shm_addr, s.st_size);
+    write(STDOUT_FILENO, shm_rc_addr, s.st_size);
     exit(0);
 }
 
