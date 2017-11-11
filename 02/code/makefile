@@ -8,12 +8,12 @@ CFLAGS = $(SETT) $(INCL_DIRS) $(PTHREAD) $(DEBUG)
 
 LDFLAGS = -lrt -lm
 
-A2_FALL2017_DEPS = a2_fall2017.c getCmdTokens.o utils/getLine.o utils/minTokenLen.o utils/maxTokenLen.o
+A2_FALL2017_DEPS = a2_fall2017.c utils/getCmdTokens.o utils/getLine.o utils/minTokenLen.o utils/maxTokenLen.o
 a2_fall2017: $(A2_FALL2017_DEPS)
 	$(CC) $(A2_FALL2017_DEPS) -o $(@) $(CFLAGS) $(LDFLAGS)
 
 GETCMDTOKENS_DEPS = utils/getCmdTokens.c
-getCmdTokens.o: $(GETCMDTOKENS_DEPS) utils/getCmdTokens.h
+utils/getCmdTokens.o: $(GETCMDTOKENS_DEPS) utils/getCmdTokens.h
 	$(CC) -c $(GETCMDTOKENS_DEPS) -o $(@) $(CFLAGS)
 
 GETLINE_DEPS = utils/getLine.c

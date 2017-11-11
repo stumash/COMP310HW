@@ -1,0 +1,9 @@
+init
+status
+reserve stu0 A 100
+reserve stu2 A 102
+reserve stu1 A 101
+status
+reserve mash4 B 204
+reserve mash1 B 201
+exit

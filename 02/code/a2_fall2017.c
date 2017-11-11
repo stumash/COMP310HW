@@ -29,8 +29,8 @@
 #define EXIT "exit"
 
 // semaphore names
-#define SEM_WRITE "sem_write" // semaphore to alter number of active writers (0 or 1)
-#define SEM_READERCOUNT "sem_readercount" // semaphore to alter number of active readers
+#define SEM_WRITE "/sem_write" // semaphore to alter number of active writers (0 or 1)
+#define SEM_READERCOUNT "/sem_readercount" // semaphore to alter number of active readers
 // semaphores
 sem_t *write_mutex;
 sem_t *readercount_mutex;
@@ -102,8 +102,8 @@ int main()
     shm_rc_addr = mmap(NULL, s.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_rc_fd, 0);
 
     // setup semaphores
-    write_mutex = sem_open(SEM_WRITE, O_CREAT, 0644, 1);
-    readercount_mutex = sem_open(SEM_READERCOUNT, O_CREAT, 0644, 1);
+    write_mutex = sem_open(SEM_WRITE, O_CREAT | O_RDWR, 0664, 1);
+    readercount_mutex = sem_open(SEM_READERCOUNT, O_CREAT | O_RDWR, 0664, 1);
 
     // main loop
     char *shmad = shm_addr; // temp variable
@@ -207,7 +207,9 @@ int main()
         //
         else if (!strcmp(tokens[0], INIT))
         {
+            printf("dank\n");
             sem_wait(write_mutex);
+            printf("dank\n");
 
             for (int i = 0; i < N_TABLES * MAX_RES_NAME_LEN; i++)
             {
