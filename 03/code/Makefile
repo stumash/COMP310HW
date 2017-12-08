@@ -12,7 +12,7 @@ SOURCES= disk_emu.c sfs_api.c sfs_test.c sfs_api.h
 
 
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE= ID_LASTNAME_FIRSTNAME
+EXECUTABLE= 260639962_Stuart_Mashaal
 
 all: $(SOURCES) $(HEADERS) $(EXECUTABLE)
 
