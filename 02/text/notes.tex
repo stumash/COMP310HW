@@ -1,0 +1,109 @@
+\documentclass[11pt, letterpaper]{article}
+
+\usepackage[utf8]{inputenc} % utf-8 encoding
+\usepackage[margin=0.75in]{geometry} % page margins
+\usepackage{graphicx} % images
+\graphicspath{ {images/} } % default images path
+\usepackage{float} % use figures
+\usepackage{caption} % caption figures
+\usepackage{subcaption} % subfigures and subcaptions
+\setlength\parindent{0pt} % no paragraph indent
+\usepackage{minted} % code samples
+\usepackage{amsmath} % math tools
+
+\title{Title}
+\author{Stuart Mashaal}
+\date{Thursday, November 09, 2017}
+
+\begin{document}
+
+\begin{titlepage}
+    \maketitle
+\end{titlepage}
+
+\section*{Question 1}
+\label{sec:question_1}
+
+\subsection*{The Question}
+\label{sub:the_question}
+
+Using the code below, give a sequence of steps that can lead to deadlock. \\
+
+\begin{minipage}{0.5\textwidth}
+    \textbf{Process 0}
+    \begin{minted}[linenos]{python}
+    flag[0] = True
+    while (flag[1]): pass
+    critical_section()
+    flag[0] = False
+    \end{minted}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \textbf{Process 1}
+    \begin{minted}[linenos]{python}
+    flag[1] = True
+    while (flag[0]): pass
+    critical_section()
+    flag[1] = False
+    \end{minted}
+\end{minipage}
+
+\subsection*{The Answer}
+\label{sub:the_question}
+
+Steps:
+
+\begin{enumerate}
+    \item Process 0 runs line 1, setting flag[0] to True
+    \item Process 1 runs line 1, setting flag[1] to True
+    \item Process 0 runs line 2, enters spin-lock
+    \item Process 1 runs line 2, enters spin-lock
+\end{enumerate}
+
+Both processes will now loop forever in deadlock if this sequence of steps is followed when the code is run, since they both enter spin locks at the same time.
+
+\pagebreak
+
+\section*{Question 2}
+\label{sec:question_2}
+
+\subsection*{The Question}
+\label{sub:the_question}
+
+Using the code below, give a sequence of steps, showing the value of the relevant variables at each step, that will cause the code to fail to provide mutual exclusion. \\
+
+\begin{minipage}{0.5\textwidth}
+    \textbf{Process 0}
+    \begin{minted}[linenos]{python}
+    while (turn != 0): pass
+    critical_section()
+    turn = 1
+    non_critical_section()
+    \end{minted}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \textbf{Process 1}
+    \begin{minted}[linenos]{python}
+    while (turn != 1): pass
+    critical_section()
+    turn = 0
+    non_critical_section()
+    \end{minted}
+\end{minipage}
+
+\subsection*{The Answer}
+\label{sub:the_answer}
+
+Other than the trivial solution where the initial value of the shared variable `turn' is not $\in \{0,1\}$ (in which case neither process ever gets past their spinlock), this code \textit{actually does} provide mutual exclusion.  However, this code does not satisfy one of the other conditions of correctness of a solution to the \textit{critical section problem}, namely that \textbf{a thread blocked from entering a critical section can only be blocked by a thread in the critical section}. \\
+
+Steps:
+
+\begin{enumerate}
+    \item Set turn to 0
+    \item Process 0 runs lines 1 through 4, entering the non\_criical\_section().  This non\_critical\_section() halts forever
+    \item Process 1 runs lines 1 through 4, completing its non\_critical\_section()
+\end{enumerate}
+
+Now Process 0 and 1 have both had their turn at running the critical\_section().  However, now that Process 0 is stuck forever inside of its non\_critical\_section(), Process 1 will never be able to re-enter its critical\_section() since `turn' will never get set to 1 again by Process 0.  This means that Process 1 is blocked from entering its critical\_section() \textbf{despite the fact that Process 0 is not in the critical\_section() itself}.
+
+\end{document}

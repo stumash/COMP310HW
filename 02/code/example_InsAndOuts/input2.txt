@@ -1,0 +1,4 @@
+init
+reserve stu1 A 101
+status
+exit
