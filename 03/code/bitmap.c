@@ -21,8 +21,8 @@ uint8_t free_bit_map[SIZE] = { [0 ... SIZE-1] = UINT8_MAX };
 
 void force_set_index(uint32_t index) {
     // TODO
-    // Used to force indicies to used 
-    // this is the opposite of rm_index. 
+    // Used to force indicies to used
+    // this is the opposite of rm_index.
 }
 
 uint32_t get_index() {
@@ -37,7 +37,7 @@ uint32_t get_index() {
         The ffs() function returns the position of the first (least
        significant) bit set in the word i.  The least significant bit is
        position 1 and the most significant position is, for example, 32 or
-       64.  
+       64.
     */
     // Since ffs has the lsb as 1, not 0. So we need to subtract
     uint8_t bit = ffs(free_bit_map[i]) - 1;

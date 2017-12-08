@@ -10,7 +10,7 @@
  * @long Use this to setup your superblock, inode table and free bit map
  *       This has been left unimplemented. You should fill it out.
  *
- * @param index index to set 
+ * @param index index to set
  *
  */
 void force_set_index(uint32_t index);
