@@ -14,7 +14,7 @@
 // set _which_bit to 1 in _data
 #define FREE_BIT(_data, _which_bit) \
     _data = _data | (1 << _which_bit)
-// return nonzero (true) if _which_bit is set to 1 in _data
+// set _which_bit to 0 in _data
 #define USE_BIT(_data, _which_bit) \
     _data = _data & ~(1 << _which_bit)
 
@@ -78,14 +78,13 @@
 
 /*-----------------------------------------------------------------------------------------
  *  NECESSARY DATA STRUCTURES: BITMAP, INODE TABLE, SUPERBLOCK, DIR_ENTRY, OPEN_FILE_TABLE
- *  (AND ASSOCIATED HELPER FUNCTIONS)
  *---------------------------------------------------------------------------------------*/
 
 /*--------------------------------------------------
  *  THE BITMAP
  *------------------------------------------------- */
 // initialize all blocks free except first data block for root dir
-static uint8_t free_bitmap[BITMAP_ROW_SIZE] = { 0x7F, [1 ... BITMAP_ROW_SIZE - 1] = UINT8_MAX };
+static uint8_t free_bitmap[BITMAP_ROW_SIZE] = { 0xFE, [1 ... BITMAP_ROW_SIZE - 1] = UINT8_MAX };
 
 /*--------------------------------------------------
  *  INODE
@@ -107,12 +106,12 @@ static st_inode default_root_dir_inode = {
     .uid       = 1000,
     .gid       = 1000,
     .size      = 0,
-    .blk_pntrs = {FIRST_DATA_BLOCK_START_ADRESS, 0,0,0,0,0,0,0,0,0,0,0},
+    .blk_pntrs = {FIRST_DATA_BLOCK_INDEX, 0,0,0,0,0,0,0,0,0,0,0},
     .ind_pntr  = 0 // an inode number
 };
 
 // default bitmap for inodes in use.  first inode is used for root dir
-static uint8_t inode_bitmap[BITMAP_ROW_SIZE] = { 0x7F, [1 ... BITMAP_ROW_SIZE - 1] = UINT8_MAX };
+static uint8_t inode_bitmap[BITMAP_ROW_SIZE] = { 0xFE, [1 ... BITMAP_ROW_SIZE - 1] = UINT8_MAX };
 
 // in-memory cache of inode table. default first elem is default_root_dir_inode
 static st_inode inode_table[NUM_BLOCKS] = {0};
@@ -146,7 +145,7 @@ typedef struct _dir_entry
     uint8_t filename[MAX_FILENAME_SIZE];
 } dir_entry; // 32 bytes total
 
-static dir_entry dir_cache[NUM_BLOCKS / 32] = {0};
+static dir_entry dir_cache[NUM_BLOCKS] = {0};
 
 /*--------------------------------------------------
  *  OPEN FILE DESCRIPTORS
@@ -154,11 +153,22 @@ static dir_entry dir_cache[NUM_BLOCKS / 32] = {0};
 typedef struct _fd_table_entry
 {
     uint32_t inode_number;
-    uint32_t rw_pointer;
+    uint32_t rw_pointer; // an offset
 } fd_table_entry; // 8 bytes total
 
 static uint32_t num_open_fd = 0; // num of open file descriptors
-static open_fd_table[NUM_BLOCKS] =  {0};
+static fd_table_entry open_fd_table[NUM_BLOCKS] =  {0};
+
+
+
+/*--------------------------------------------------
+ *  MY HELPERS
+ *------------------------------------------------- */
+void write_all_data_to_disk() {
+    // TODO
+}
+
+
 
 /*--------------------------------------------------
  *  THE SFS API
@@ -197,7 +207,7 @@ void mksfs(int fresh) {
         // read in inode table
         read_blocks(FIRST_INODE_BLOCK_INDEX, NUM_INODE_BLOCKS, inode_table);
 
-        // read in directory
+        // read in directory to dir_cache
         st_inode root_dir_inode = inode_table[0];
         uint32_t root_dir_num_blocks  = root_dir_inode.size / BYTES_PER_BLOCK;
         if (root_dir_inode.size % BYTES_PER_BLOCK) root_dir_num_blocks += 1;
@@ -224,10 +234,91 @@ int sfs_getfilesize(const char* path){
 
 }
 int sfs_fopen(char *name){
+    // does the file exist. if so what is inode number
+    uint32_t file_inode = 0;
+    uint32_t file_first_block = 0;
+    for (int dir_entry_index = 0; dir_entry_index < NUM_BLOCKS; ++dir_entry_index) {
+        if (strcmp(dir_cache[dir_entry_index].filename, name) == 0) {
+            file_inode = dir_cache[dir_entry_index].inode_number;
+        }
+    }
 
+    if (file_inode) {// if file exists, check if already open
+        for (int fd_table_index = 0; fd_table_index < NUM_BLOCKS; ++fd_table_index) {
+            if (open_fd_table[fd_table_index].inode_number == file_inode) {
+                return fd_table_index;
+            }
+        }
+    } else { // file doesn't exist, create inode and directory entry
+
+        int found_first_free_inode = 0;
+        for (int inode_bitmap_idx = 0; inode_bitmap_idx < BITMAP_ROW_SIZE; ++inode_bitmap_idx) {
+            if (found_first_free_inode) break;
+            if (inode_bitmap[inode_bitmap_idx] > 0) {
+                for (int bit_idx = 0; bit_idx < 8; ++bit_idx) { //
+                    if (found_first_free_inode) break;
+                    if (inode_bitmap[inode_bitmap_idx] & (1 << bit_idx)) {
+                        USE_BIT(inode_bitmap[inode_bitmap_idx], bit_idx);
+                        file_inode = inode_bitmap_idx * 8 + bit_idx;
+                        found_first_free_inode = 1;
+                    }
+                }
+            }
+        }
+        if (!found_first_free_inode) { printf("NO INODE BLOCKS FREE"); return -1; }
+
+        int found_first_free_data_block = 0;
+        for (int free_bitmap_idx = 0; free_bitmap_idx < BITMAP_ROW_SIZE; ++free_bitmap_idx) {
+            if (found_first_free_data_block) break;
+            if (free_bitmap[free_bitmap_idx] > 0) {
+                for (int bit_idx = 0; bit_idx < 8; ++bit_idx) {
+                    if (found_first_free_data_block) break;
+                    if (free_bitmap[free_bitmap_idx] & (1 << bit_idx)) {
+                        USE_BIT(free_bitmap[free_bitmap_idx], bit_idx);
+                        file_first_block = FIRST_DATA_BLOCK_INDEX + free_bitmap_idx*8 + bit_idx;
+                        found_first_free_data_block = 1;
+                    }
+                }
+            }
+        }
+        if (!found_first_free_data_block) { printf("NO DATA BLOCKS FREE"); return -1; }
+
+        // create inode
+        inode_table[file_inode] = default_root_dir_inode;
+        inode_table[file_inode].blk_pntrs[0] = file_first_block;
+
+        // create directory entry, set file_inode and filename
+        for (int dir_entry_idx = 0; dir_entry_idx < NUM_BLOCKS; ++dir_entry_idx) {
+            if (dir_cache[dir_entry_idx].inode_number == 0) {
+                dir_cache[dir_entry_idx].inode_number = file_inode;
+                memcpy(dir_cache[dir_entry_idx].filename, name, strlen(name));
+                break;
+            }
+        }
+    }
+
+    // write the new inode and dir_entry to disk
+    write_blocks(FIRST_INODE_BLOCK_INDEX, NUM_INODE_BLOCKS, inode_table);
+    // TODO: write dir entry to disk
+
+    // put the new open file in the fd_table and return its index therein
+    for (int fd_table_index = 0; fd_table_index < NUM_BLOCKS; ++fd_table_index) {
+        if (open_fd_table[fd_table_index].inode_number == 0)
+        {
+            open_fd_table[fd_table_index].inode_number = file_inode;
+            open_fd_table[fd_table_index].rw_pointer = 0;
+            return fd_table_index;
+        }
+    }
 }
 int sfs_fclose(int fileID) {
-
+    if (open_fd_table[fileID].inode_number == 0) {
+        printf("ERROR: file descriptor not found.");
+        return -1;
+    } else {
+        fd_table_entry empty_fd_entry = {0};
+        memcpy(open_fd_table + fileID, &empty_fd_entry, sizeof(fd_table_entry));
+    }
 }
 int sfs_fread(int fileID, char *buf, int length) {
 
@@ -236,7 +327,18 @@ int sfs_fwrite(int fileID, const char *buf, int length) {
 
 }
 int sfs_fseek(int fileID, int loc) {
-
+    if (open_fd_table[fileID].inode_number == 0) {
+        printf("ERROR: file descriptor not found.");
+        return -1;
+    } else {
+        st_inode inode = inode_table[open_fd_table[fileID].inode_number];
+        if (loc < 0 || loc > inode.size) {
+            printf("ERROR: loc argument out of range.");
+            return -1;
+        } else {
+            open_fd_table[fileID].rw_pointer = loc;
+        }
+    }
 }
 int sfs_remove(char *file) {
 

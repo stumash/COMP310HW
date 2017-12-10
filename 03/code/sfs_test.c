@@ -74,7 +74,6 @@ main(int argc, char **argv)
   int tmp;
 
   mksfs(1);                     /* Initialize the file system. */
-  return 0;
 
   /* First we open two files and attempt to write data to them.
    */
@@ -85,6 +84,7 @@ main(int argc, char **argv)
       fprintf(stderr, "ERROR: creating first test file %s\n", names[i]);
       error_count++;
     }
+    return 0;
     tmp = sfs_fopen(names[i]);
     if (tmp >= 0 && tmp != fds[i]) {
       fprintf(stderr, "ERROR: file %s was opened twice\n", names[i]);
