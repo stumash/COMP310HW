@@ -84,7 +84,6 @@ main(int argc, char **argv)
       fprintf(stderr, "ERROR: creating first test file %s\n", names[i]);
       error_count++;
     }
-    return 0;
     tmp = sfs_fopen(names[i]);
     if (tmp >= 0 && tmp != fds[i]) {
       fprintf(stderr, "ERROR: file %s was opened twice\n", names[i]);
@@ -184,6 +183,7 @@ main(int argc, char **argv)
       free(buffer);
     }
   }
+  return 0;
 
   for (i = 0; i < 2; i++) {
     if (sfs_fclose(fds[i]) != 0) {
