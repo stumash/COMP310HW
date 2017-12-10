@@ -3,7 +3,10 @@
 #include <assert.h>
 #include <stdio.h>
 
+extern uint8_t free_bit_map[];
+
 int main() {
+    int x = 0;
 
     /*
      * Get 64 blocks.
@@ -25,7 +28,7 @@ int main() {
     /*
      * Get more blocks
      * Since we just freed 3, we should get
-     * thos blocks back
+     * those blocks back
      */
     for (int i=0; i < 3; i++) {
         assert(get_index() == to_free[i]);

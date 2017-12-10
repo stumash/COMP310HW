@@ -60,4 +60,3 @@ void rm_index(uint32_t index) {
     // free bit
     FREE_BIT(free_bit_map[i], bit);
 }
-
